@@ -4,7 +4,7 @@ Train function
 
 import argparse
 import time
-import neptune.new as neptune
+import neptune #.new as neptune
 
 import os, sys
 import math
@@ -354,8 +354,8 @@ def main(args, mc):
 
     # set-up neptune
     run = neptune.init_run(
-        project=YOUR_PROJECT_NAME, # your project name
-        api_token=YOUR_TOKEN, # use your own token
+        project="GMS/cgm-gm",
+        api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI1OGQ1ZjMwYy01MTQ3LTQyMzMtOTIyNS1kNGFkYjQ4YTM3OTcifQ==",
         tags=[args.tag],
         mode=args.neptune
     )  # your credentials
