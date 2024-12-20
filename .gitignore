@@ -1,0 +1,6 @@
+**/.venv
+/__pycache/*
+/metrics/__pycache__/*
+/utils/__pycache__/*
+*.pyc
+
