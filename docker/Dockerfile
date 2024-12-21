@@ -14,8 +14,7 @@ RUN rm /usr/bin/python3
 RUN ln -s /usr/bin/python3.10 /usr/bin/python
 
 RUN git clone https://github.com/CengizPoyraz/cgm-gm.git $GMS_HOME
-
-RUN cd $GMS_HOME
+RUN pip install -r $GMS_HOME/requirements.txt
 
 # in case you prefer to use venv
 # RUN python -m venv .venv 
