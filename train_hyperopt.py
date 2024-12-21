@@ -26,6 +26,13 @@ import torchaudio
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 import functools
 
+#tensorboard
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter()
+
+#torch summary
+from torchinfo import summary as torchinfosummary        
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -307,6 +314,15 @@ class TimeSpecConverter:
     def griffinlim(self, wfs):
         return self.griffinlim(wfs)
         
+def summary(args):    
+    # setup the model
+    model = cVAE(in_dim=args.fft_size, z_dim=args.z_dim, ncond=args.ncond, z_rnn_dim=args.z_rnn_dim, in_size=3).to(args.device)
+
+    print('========================')
+    print('Model Summary')
+    print('========================\n')
+
+    torchinfosummary(model)
 
 def main(args, mc):
 
@@ -417,42 +433,48 @@ if __name__ == '__main__':
     parser.add_argument('--power', type=int, default=1, help='power of the spectrogram')
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
+    #summary
+    parser.add_argument('--only-summary', dest='onlySummary', action=argparse.BooleanOptionalAction, help='model summary')
+
     args = parser.parse_args()
+    if args.onlySummary:
+        summary(args)
+        writer.close()
+    else:
+        def get_experiment_space():
+            space = {  # Architecture parameters
+                'model': 'vae',
+                'lr': hp.choice('lr', [8e-4, 7e-4, 6e-4]),
+                'z_rnn_dim': hp.choice('z_rnn_dim', [16, 32]),
+                'z_dim': hp.choice('z_dim', [8, 16, 32]),
+                'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),
+                'weight_decay': hp.choice('weight_decay', [5e-6, 1e-5, 1e-6]),
+                'alpha': hp.choice('alpha', [0.01, 0.05, 0.1]),
+                'ncond': hp.choice('ncond', [16, 32]),
+                'log_reg': True, # hp.choice('log_reg', [True, False]),
 
-    def get_experiment_space():
-        space = {  # Architecture parameters
-            'model': 'vae',
-            'lr': hp.choice('lr', [8e-4, 7e-4, 6e-4]),
-            'z_rnn_dim': hp.choice('z_rnn_dim', [16, 32]),
-            'z_dim': hp.choice('z_dim', [8, 16, 32]),
-            'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),
-            'weight_decay': hp.choice('weight_decay', [5e-6, 1e-5, 1e-6]),
-            'alpha': hp.choice('alpha', [0.01, 0.05, 0.1]),
-            'ncond': hp.choice('ncond', [16, 32]),
-            'log_reg': True, # hp.choice('log_reg', [True, False]),
+                # Data parameters
+                'batch_size': hp.choice('batch_size', [128, 256])}
 
-            # Data parameters
-            'batch_size': hp.choice('batch_size', [128, 256])}
+            return space
 
-        return space
+        rstate = np.random.default_rng(args.seed)
+        print(f'rstate: {rstate}')
+        trials = Trials()
+        fmin_objective = functools.partial(main, args)
+        space = get_experiment_space()
+        fmin(fmin_objective, space=space, algo=tpe.suggest, max_evals=30, trials=trials, verbose=True, rstate=rstate)
+        
+        # opt_params = {  # Architecture parameters
+        #        'model': 'vae',
+        #        'lr': 7e-4,
+        #        'z_rnn_dim': 32,
+        #        'z_dim': 16,
+        #        'beta': 0.05,
+        #        'weight_decay': 5e-6,
 
-    rstate = np.random.default_rng(args.seed)
-    print(f'rstate: {rstate}')
-    trials = Trials()
-    fmin_objective = functools.partial(main, args)
-    space = get_experiment_space()
-    fmin(fmin_objective, space=space, algo=tpe.suggest, max_evals=30, trials=trials, verbose=True, rstate=rstate)
-    
-    # opt_params = {  # Architecture parameters
-    #        'model': 'vae',
-    #        'lr': 7e-4,
-    #        'z_rnn_dim': 32,
-    #        'z_dim': 16,
-    #        'beta': 0.05,
-    #        'weight_decay': 5e-6,
+        #        # Data parameters
+        #        'batch_size': 256}
 
-    #        # Data parameters
-    #        'batch_size': 256}
-
-    opt_params = None
-    main(args, opt_params)
+        opt_params = None
+        main(args, opt_params)

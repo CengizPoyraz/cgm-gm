@@ -2,5 +2,6 @@
 /__pycache/*
 /metrics/__pycache__/*
 /utils/__pycache__/*
+/runs
 *.pyc
 
