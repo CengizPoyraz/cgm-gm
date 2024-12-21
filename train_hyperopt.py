@@ -26,13 +26,6 @@ import torchaudio
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 import functools
 
-#tensorboard
-from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter()
-
-#torch summary
-from torchinfo import summary as torchinfosummary        
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -314,14 +307,16 @@ class TimeSpecConverter:
     def griffinlim(self, wfs):
         return self.griffinlim(wfs)
         
-def summary(args):    
+def summary(args):
+    from torchinfo import summary as torchinfosummary    
+
     # setup the model
     model = cVAE(in_dim=args.fft_size, z_dim=args.z_dim, ncond=args.ncond, z_rnn_dim=args.z_rnn_dim, in_size=3).to(args.device)
 
-    print('========================')
+    print('=================================================================')
     print('Model Summary')
-    print('========================\n')
-
+    print('=================================================================')
+    
     torchinfosummary(model)
 
 def main(args, mc):
@@ -433,14 +428,18 @@ if __name__ == '__main__':
     parser.add_argument('--power', type=int, default=1, help='power of the spectrogram')
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
-    #summary
+    #custom arguments
     parser.add_argument('--only-summary', dest='onlySummary', action=argparse.BooleanOptionalAction, help='model summary')
+    parser.add_argument('--enable-tensorboard', dest='enableTensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
 
     args = parser.parse_args()
     if args.onlySummary:
         summary(args)
-        writer.close()
     else:
+        if args.enableTensorboard:
+            from torch.utils.tensorboard import SummaryWriter
+            writer = SummaryWriter()
+        
         def get_experiment_space():
             space = {  # Architecture parameters
                 'model': 'vae',
@@ -478,3 +477,6 @@ if __name__ == '__main__':
 
         opt_params = None
         main(args, opt_params)
+
+        if args.useTensorboard:
+            writer.close()
