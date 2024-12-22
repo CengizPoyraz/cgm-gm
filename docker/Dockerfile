@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu20.04
-ENV TZ=TR GMS_HOME=/home/root/cgm-gm
+ENV TZ=TR DEBIAN_FRONTEND=noninteractive GMS_HOME=/home/root/cgm-gm
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update
