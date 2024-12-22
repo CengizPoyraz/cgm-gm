@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:20.04
+FROM nvidia/cuda:12.3.1-base-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
 
