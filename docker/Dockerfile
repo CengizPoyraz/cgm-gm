@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu20.04
-ENV TZ=TR DEBIAN_FRONTEND=noninteractive
+ENV TZ=TR GMS_HOME=/home/root/cgm-gm
+
 SHELL ["/bin/bash", "-c"]
 
-ENV GMS_HOME=/home/root/cgm-gm
 RUN apt-get update
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
