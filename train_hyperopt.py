@@ -478,5 +478,5 @@ if __name__ == '__main__':
         opt_params = None
         main(args, opt_params)
 
-        if args.useTensorboard:
+        if args.enableTensorboard:
             writer.close()
