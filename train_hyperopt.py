@@ -1,3 +1,11 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+GMS_HOME = os.getenv('GMS_HOME')
+def get_gms_path(relative_path):
+    return os.path.join(GMS_HOME, relative_path)
+
 '''
 Train function
 '''
@@ -402,8 +410,8 @@ def main(args, mc):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='training parameters')
-    parser.add_argument('--path', type=str, default='$GMS_HOME/data', help='data directory')  
-    parser.add_argument('--log_dir', type=str, default='$GMS_HOME/log', help='model saving directory')  
+    parser.add_argument('--path', type=str, default=get_gms_path('/data'), help='data directory')  
+    parser.add_argument('--log_dir', type=str, default=get_gms_path('/log'), help='model saving directory')  
     parser.add_argument('--epochs', type=int, default=5000, help='max epochs')
     parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), help='computing device')
     parser.add_argument('--batch_size', type=int, default=64, help='batch size')
