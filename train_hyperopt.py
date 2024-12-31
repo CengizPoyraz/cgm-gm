@@ -401,8 +401,8 @@ def main(args, mc):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='training parameters')
-    parser.add_argument('--path', type=str, default='./data', help='data directory')  
-    parser.add_argument('--log_dir', type=str, default='./log', help='model saving directory')  
+    parser.add_argument('--path', type=str, default='$GMS_HOME/data', help='data directory')  
+    parser.add_argument('--log_dir', type=str, default='$GMS_HOME/log', help='model saving directory')  
     parser.add_argument('--epochs', type=int, default=5000, help='max epochs')
     parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), help='computing device')
     parser.add_argument('--batch_size', type=int, default=64, help='batch size')
