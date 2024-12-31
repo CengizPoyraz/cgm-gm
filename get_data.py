@@ -14,11 +14,12 @@ import torchaudio
 import os
 
 
-def load_data(path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0):
+def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0):
     '''
     Arguments
     =========
-        path: Path to the dataset (csv file).
+        data_file_path: file path to the dataset (csv file).
+        idx_file_path: file path to the idx formatted file (npy file).
         time_spec_converter: STFT and inverse STFT.
         train_bs: batch size for training
         test_bs: batch size for testing
@@ -33,10 +34,19 @@ def load_data(path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0):
 
     loc = 'EW'
 
+    if data_file_path is None:
+        data_file_path = os.path.join(path, f'Time_Series_Data_v5_{loc}.csv')
+    else:
+        data_file_path = os.path.join(path, data_file_path)
+    if idx_file_path is None:
+        idx_file_path = os.path.join(path, f'rand_idx_{loc}.npy')
+    else:
+        idx_file_path = os.path.join(path, idx_file_path)
+
     # customized load filtered data
-    data = pd.read_csv(path + f'Time_Series_Data_v5_{loc}.csv', header=None)
-    if os.path.exists(path + f'rand_idx_{loc}.npy'):
-        ridx = np.load(path + f'rand_idx_{loc}.npy')
+    data = pd.read_csv(data_file_path, header=None)
+    if os.path.exists(idx_file_path):
+        ridx = np.load(idx_file_path)
         if len(ridx) == data.shape[0]:
             data = data.iloc[ridx]
 

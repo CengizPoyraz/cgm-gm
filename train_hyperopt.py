@@ -360,7 +360,7 @@ def main(args, mc):
     print('Loading data...')
     print('========================\n')
     
-    train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, time_spec_converter=time_spec_converter, train_bs=args.batch_size, tcondvar=args.tcondvar)
+    train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter=time_spec_converter, train_bs=args.batch_size, tcondvar=args.tcondvar)
     SEQ_LEN = time_serie_len//args.h_len + 1
 
     # set-up neptune
@@ -401,13 +401,10 @@ def main(args, mc):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='training parameters')
-    parser.add_argument('--path', type=str, default='/scratch/gm/data/',
-                        help='data directory')  
-    parser.add_argument('--log_dir', type=str, default='/scratch/gm/logs',
-                        help='model saving directory')  
+    parser.add_argument('--path', type=str, default='./data', help='data directory')  
+    parser.add_argument('--log_dir', type=str, default='./log', help='model saving directory')  
     parser.add_argument('--epochs', type=int, default=5000, help='max epochs')
-    parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
-                        help='computing device')
+    parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), help='computing device')
     parser.add_argument('--batch_size', type=int, default=64, help='batch size')
     parser.add_argument('--lr', type=float, default=3e-4, help='learning rate')
     parser.add_argument('--weight_decay', type=float, default=1e-7, help='weight decay')
@@ -429,6 +426,8 @@ if __name__ == '__main__':
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
     #custom arguments
+    parser.add_argument('--data-file', type=str, dest='dataFile', default='data.csv', help='data file name or path')  
+    parser.add_argument('--idx-file', type=str, dest='idxFile', default='idx.npy', help='idx file name or path')  
     parser.add_argument('--only-summary', dest='onlySummary', action=argparse.BooleanOptionalAction, help='model summary')
     parser.add_argument('--enable-tensorboard', dest='enableTensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
 

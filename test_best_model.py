@@ -203,7 +203,7 @@ def eval(args):
 
     time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
 
-    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
+    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
 
     # setup the model
     model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
@@ -245,7 +245,7 @@ def main(args, mc=None):
         print('========================\n')
 
         time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
-        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
+        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
 
         # setup the model
         model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
@@ -308,12 +308,9 @@ def set_seed(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='training parameters')
-    parser.add_argument('--path', type=str, default='/scratch/gm/data/',
-                        help='data directory')  
-    parser.add_argument('--log_dir', type=str, default='/scratch/gm/logs',
-                        help='model saving directory')
-    parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
-                        help='computing device')
+    parser.add_argument('--path', type=str, default='./data', help='data directory')  
+    parser.add_argument('--log_dir', type=str, default='./log', help='model saving directory')
+    parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), help='computing device')
     parser.add_argument('--epochs', type=int, default=3000, help='max epochs')
     parser.add_argument('--batch_size', type=int, default=64, help='batch size')
     parser.add_argument('--lr', type=float, default=3e-4, help='learning rate')
@@ -333,6 +330,10 @@ if __name__ == '__main__':
     parser.add_argument('--h_len', type=int, default=46, help='hop length') 
     parser.add_argument('--power', type=int, default=1, help='power of the spectrogram')
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
+
+    #custom arguments
+    parser.add_argument('--data-file', type=str, dest='dataFile', default='data.csv', help='data file name or path')  
+    parser.add_argument('--idx-file', type=str, dest='idxFile', default='idx.npy', help='idx file name or path')  
 
     args = parser.parse_args()
     main(args)

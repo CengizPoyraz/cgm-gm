@@ -1,6 +1,10 @@
 # syntax=docker/dockerfile:1
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu20.04
-ENV TZ=TR DEBIAN_FRONTEND=noninteractive GMS_HOME=/home/root/cgm-gm
+ENV TZ=TR \
+    DEBIAN_FRONTEND=noninteractive \
+    GMS_HOME=/home/root/cgm-gm \
+    GMS_GIT_URL=https://github.com/CengizPoyraz/cgm-gm.git
+WORKDIR $GMS_HOME
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update
@@ -12,7 +16,7 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 RUN rm /usr/bin/python3
 RUN ln -s /usr/bin/python3.10 /usr/bin/python
 
-RUN git clone https://github.com/CengizPoyraz/cgm-gm.git $GMS_HOME
+RUN git clone $GMS_GIT_URL $GMS_HOME
 RUN pip install -r $GMS_HOME/requirements.txt
 
 # in case you prefer to use venv
