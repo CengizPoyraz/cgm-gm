@@ -1,11 +1,3 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-GMS_HOME = os.getenv('GMS_HOME')
-def get_gms_path(relative_path):
-    return os.path.join(GMS_HOME, relative_path)
-
 '''
 Train function
 '''
@@ -36,6 +28,9 @@ import functools
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+GMS_HOME = os.getenv('GMS_HOME')
+def get_gms_path(relative_path):
+    return os.path.join(GMS_HOME, relative_path)
 
 def loss(X, X_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg=True, alpha=1.):
 

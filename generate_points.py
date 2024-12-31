@@ -15,8 +15,6 @@ from sklearn.metrics.pairwise import haversine_distances
 from math import radians
 from geopy import distance
 import os
-from dotenv import load_dotenv
-load_dotenv()
 
 GMS_HOME = os.getenv('GMS_HOME')
 def get_gms_path(relative_path):
