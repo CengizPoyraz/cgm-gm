@@ -78,7 +78,10 @@ The implementations of ergodic and non-ergodic GMM for the SFBA can be found in 
 The evaluations include the comparisons of waveform shapes, P and S arrival time, amplitude spectra, and Fourier amplitude spectra maps. We use the [PhaseNet](https://github.com/AI4EPS/PhaseNet) to pick the arrival time of P and S waves. 
 
 
-
+### Docker Repositories
+```console
+docker pull cpoyraz/gms:v3.2
+```
 
 ## License
 
