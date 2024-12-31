@@ -43,8 +43,9 @@ def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs
     else:
         idx_file_path = os.path.join(path, idx_file_path)
 
+    print(f"data file: {data_file_path}, idx file: {idx_file_path}")
     # customized load filtered data
-    data = pd.read_csv(data_file_path, header=None)
+    data = pd.read_csv(data_file_path)
     if os.path.exists(idx_file_path):
         ridx = np.load(idx_file_path)
         if len(ridx) == data.shape[0]:
