@@ -103,7 +103,8 @@ def train(args, model, train_loader, run, norm_dict, time_spec_converter):
                 random_sampling=True,
                 device=args.device)
 
-            l, rec_loss, time_domain_l, kl_div, pgv_reg = loss(wfs, wfs_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg, alpha)
+            #total_loss, recons_loss, time_domain_loss, kld_z -> l, rec_loss, time_domain_l, kl_div, pgv_reg 
+            l, rec_loss, time_domain_l, kl_div = loss(wfs, wfs_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg, alpha)
 
             optimizer.zero_grad()
             l.backward()
