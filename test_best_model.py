@@ -6,7 +6,7 @@ import argparse
 import time
 
 import matplotlib.pyplot as plt
-import neptune.new as neptune
+import neptune#.new as neptune
 
 import os, sys
 
