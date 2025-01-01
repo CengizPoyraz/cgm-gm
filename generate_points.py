@@ -15,10 +15,7 @@ from sklearn.metrics.pairwise import haversine_distances
 from math import radians
 from geopy import distance
 import os
-
-GMS_HOME = os.getenv('GMS_HOME')
-def get_gms_path(relative_path):
-    return os.path.join(GMS_HOME, relative_path)
+from gms_util import get_gms_path
 
 def min_max_norm(x, x_min, x_max, range='[0,1]', mode='add'):
 
@@ -160,11 +157,7 @@ def compute_angle(info):
     return angle
 
     
-<<<<<<< HEAD
-data = pd.read_csv(get_gms_path('/data/training_data_E_filtered_stations.csv'), header=None)
-=======
-data = pd.read_csv('$GMS_HOME/data/training_data_E_filtered_stations.csv', header=None)
->>>>>>> b0d5aeb400b03719e433f6a069ecf6687eab5b83
+data = pd.read_csv(get_gms_path('/data/training_data_E_filtered_stations.csv'))
 
 # assign names for the first 13 columns
 names = ["eid",    #"Event ID"
@@ -195,12 +188,7 @@ cond_var_dict = {0: ['mag', 'rup', 'angle'],
                  3: ['mag', 'depth'],
                  4: ['mag', 'rup', 'depth']}
 
-<<<<<<< HEAD
 log_path = get_gms_path('/log/GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0008-weight:kl=0.2-log_reg=True-w_decay=1e-05-w_len=160-h_len=46-ncond=16-tcondvar=2-seed=3407')
-=======
-log_path = '$GMS_HOME/log/GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0008-weight:kl=0.2-log_reg=True-w_decay=1e-05-w_len=160-h_len=46-ncond=16-tcondvar=2-seed=3407'
->>>>>>> b0d5aeb400b03719e433f6a069ecf6687eab5b83
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
 parameter_values = extract_parameter_values(log_path, parameter_names)
@@ -264,11 +252,8 @@ print(norm_dict)
 
 # define a region
 region = [ -122.503491204439, -121.8, 37.2661695985203, 38.066565827788]
-<<<<<<< HEAD
 non_ergs = pd.read_csv(get_gms_path(f'/data/Non_Ergodic_Prediction_Matrix_Map_2Hz.csv'), header=None) # load the non-ergodic GMM file
-=======
-non_ergs = pd.read_csv(f'$GMS_HOME/data/Non_Ergodic_Prediction_Matrix_Map_2Hz.csv', header=None) # load the non-ergodic GMM file
->>>>>>> b0d5aeb400b03719e433f6a069ecf6687eab5b83
+
 sample_lat = non_ergs[0]
 sample_lon = non_ergs[1]
 slat_idx = sample_lat[sample_lat.between(region[2], region[3])]
@@ -366,10 +351,8 @@ for ngen in tqdm(range(1)):
     Fourier_Amplitude_Array_proper_pred = fft_loop_abs[:, indices_one_sided]*delta_t
 
     Amplitude_Signal_Smoothed_loop_pred = KO98_smoothing(frequency_vector[indices_one_sided], Fourier_Amplitude_Array_proper_pred.T, 20)
-<<<<<<< HEAD
+
     np.save(get_gms_path(f'/data/Gen_FAS_cond2.npy'), Amplitude_Signal_Smoothed_loop_pred)
-=======
-    np.save(f'$GMS_HOME/data/Gen_FAS_cond2.npy', Amplitude_Signal_Smoothed_loop_pred)
->>>>>>> b0d5aeb400b03719e433f6a069ecf6687eab5b83
+
     exit()
 
