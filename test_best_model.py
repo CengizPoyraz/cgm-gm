@@ -30,13 +30,9 @@ import numpy as np
 import json
 
 import re
-
+from gms_util import get_gms_path
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-GMS_HOME = os.getenv('GMS_HOME')
-def get_gms_path(relative_path):
-    return os.path.join(GMS_HOME, relative_path)
 
 def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_converter, norm_dict, SEQ_LEN):
 
