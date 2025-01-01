@@ -189,8 +189,8 @@ def extract_parameter_values(input_string, parameter_names):
 
 
 def eval(args):
-    if os.path.exists(get_gms_path(os.path.join(args.logDir, args.checkpointFile))):
-        log_path = get_gms_path(os.path.join(args.logDir, args.checkpointFile))
+    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpointFile))):
+        log_path = get_gms_path(os.path.join(args.log_dir, args.checkpointFile))
     else:
         raise FileNotFoundError("checkpoint file not found")
         
@@ -229,8 +229,8 @@ def eval(args):
 
 
 def main(args, mc=None):
-    if os.path.exists(get_gms_path(os.path.join(args.logDir, args.checkpointFile))):
-        checkPointFile = get_gms_path(os.path.join(args.logDir, args.checkpointFile))
+    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpointFile))):
+        checkPointFile = get_gms_path(os.path.join(args.log_dir, args.checkpointFile))
     else:
         raise FileNotFoundError("checkpoint file not found")
     
