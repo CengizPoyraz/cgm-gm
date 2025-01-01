@@ -189,7 +189,11 @@ def extract_parameter_values(input_string, parameter_names):
 
 
 def eval(args):
-    log_path = get_gms_path('/log/GM_V2_VAE_data5_dist-1_bs=128-rnn_size=32-z_dim=16-lr=0.0006-weightkl=0.2-log_reg=True-w_decay=5e-06-w_len=160-h_len=46-ncond=16-tcondvar=4-seed=3407') 
+    if os.path.exists(get_gms_path(os.path.join(args.logDir, args.checkpointFile))):
+        log_path = get_gms_path(os.path.join(args.logDir, args.checkpointFile))
+    else:
+        raise FileNotFoundError("checkpoint file not found")
+        
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
     parameter_values = extract_parameter_values(log_path, parameter_names)
         
@@ -225,13 +229,15 @@ def eval(args):
 
 
 def main(args, mc=None):
-    if not os.path.exists(args.checkpointFile):
+    if os.path.exists(get_gms_path(os.path.join(args.logDir, args.checkpointFile))):
+        checkPointFile = get_gms_path(os.path.join(args.logDir, args.checkpointFile))
+    else:
         raise FileNotFoundError("checkpoint file not found")
     
-    log_dir = get_gms_path(args.checkpointFile) 
+    
     
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
-    parameter_values = extract_parameter_values(log_dir, parameter_names)
+    parameter_values = extract_parameter_values(checkPointFile, parameter_names)
         
     fft_size = parameter_values['w_len']
     w_len = parameter_values['w_len']
@@ -257,7 +263,7 @@ def main(args, mc=None):
         model = torch.nn.DataParallel(model, device_ids=[args.device])
 
         state = dict(model=model)
-        state = restore_checkpoint(log_dir, state, args.device)
+        state = restore_checkpoint(checkPointFile, state, args.device)
         model = state['model']
         print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 
@@ -337,12 +343,12 @@ if __name__ == '__main__':
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
     #custom arguments
+    parser.add_argument('--data-file', type=str, dest='dataFile', default='data.csv', help='data file name or path')  
+    parser.add_argument('--idx-file', type=str, dest='idxFile', default='idx.npy', help='idx file name or path')  
     parser.add_argument('--checkpoint-file', type=str, dest='checkpointFile', \
                         default=get_gms_path('GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.08-log_reg=True-w_decay=1e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407'), \
-                        help='checkpoint file name or path')  
+                        help='checkpoint file name')  
 
     args = parser.parse_args()
     main(args)
-
-# GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.02-log_reg=True-w_decay=5e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407
-#python test_best_model.py --tcondvar 4 --batch-size 128 --path $GMS_HOME/data/ --log_dir $GMS_HOME/log/
+    
