@@ -185,12 +185,12 @@ def extract_parameter_values(input_string, parameter_names):
 
 
 def eval(args):
-    log_path = get_gms_path(args.log_dir, args.checkpoint_file)
-    if not os.path.exists(log_path):
-        raise FileNotFoundError(f"checkpoint file not found - {log_path}")
+    checkpoint_file = get_gms_path(args.log_dir, args.checkpoint_file)
+    if not os.path.exists(checkpoint_file):
+        raise FileNotFoundError(f"checkpoint file not found - {checkpoint_file}")
         
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond", "bs"]
-    parameter_values = extract_parameter_values(log_path, parameter_names)
+    parameter_values = extract_parameter_values(checkpoint_file, parameter_names)
         
     fft_size = parameter_values['w_len']
     w_len = parameter_values['w_len']
@@ -212,7 +212,7 @@ def eval(args):
     model = torch.nn.DataParallel(model, device_ids=[args.device])
 
     state = dict(model=model)
-    state = restore_checkpoint(log_path, state, args.device)
+    state = restore_checkpoint(checkpoint_file, state, args.device)
     model = state['model']
 
     SEQ_LEN = time_serie_len//h_len + 1
