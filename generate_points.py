@@ -6,7 +6,7 @@ import torch
 from model.dvae import *
 from argparse import Namespace
 from train_hyperopt import restore_checkpoint, TimeSpecConverter
-import numpy as np
+import cupy as np
 from itertools import product
 import pandas as pd
 import torchaudio

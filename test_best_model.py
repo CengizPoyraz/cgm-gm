@@ -26,7 +26,7 @@ import torchaudio
 # hyperopt dependencies
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 import functools
-import numpy as np
+import cupy as np
 import json
 
 import re
