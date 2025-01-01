@@ -364,7 +364,7 @@ def main(args, mc):
     print('Loading data...')
     print('========================\n')
     
-    train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter=time_spec_converter, train_bs=args.batch_size, tcondvar=args.tcondvar)
+    train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter=time_spec_converter, train_bs=args.batch_size, tcondvar=args.tcondvar)
     SEQ_LEN = time_serie_len//args.h_len + 1
 
     # set-up neptune
@@ -430,18 +430,18 @@ if __name__ == '__main__':
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
     #custom arguments
-    parser.add_argument('--data-file', type=str, dest='dataFile', default='data.csv', help='data file name or path')  
-    parser.add_argument('--idx-file', type=str, dest='idxFile', default='idx.npy', help='idx file name or path')  
-    parser.add_argument('--only-summary', dest='onlySummary', action=argparse.BooleanOptionalAction, help='model summary')
-    parser.add_argument('--enable-tensorboard', dest='enableTensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
+    parser.add_argument('--data_file', type=str, dest='data_file', default='data.csv', help='data file name or path')  
+    parser.add_argument('--idx_file', type=str, dest='idx_file', default='idx.npy', help='idx file name or path')  
+    parser.add_argument('--only_summary', dest='only_summary', action=argparse.BooleanOptionalAction, help='model summary')
+    parser.add_argument('--enable_tensorboard', dest='enable_tensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
 
     args = parser.parse_args()
-    if args.onlySummary:
+    if args.only_summary:
         summary(args)
     else:
-        if args.enableTensorboard:
+        if args.enable_tensorboard:
             from torch.utils.tensorboard import SummaryWriter
-            writer = SummaryWriter()
+            writer = SummaryWriter(get_gms_path("/log"))
         
         def get_experiment_space():
             space = {  # Architecture parameters
@@ -481,5 +481,5 @@ if __name__ == '__main__':
         opt_params = None
         main(args, opt_params)
 
-        if args.enableTensorboard:
+        if args.enable_tensorboard:
             writer.close()
