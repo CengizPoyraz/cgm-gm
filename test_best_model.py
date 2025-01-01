@@ -173,14 +173,15 @@ def restore_checkpoint(ckpt_dir, state, device='cuda:0'):
 
 def extract_parameter_values(input_string, parameter_names):
     parameter_values = {}
-
+    print("parameter values: ", end="")
     for param in parameter_names:
         pattern = re.compile(f"{param}=(\d+)")
         match = pattern.search(input_string)
 
         if match:
-            parameter_values[param] = int(match.group(1))
-
+           parameter_values[param] = int(match.group(1))
+           print(f"{param}={parameter_values[param]} ", end="")
+    print("")
     return parameter_values
 
 
