@@ -6,7 +6,7 @@ import argparse
 import time
 
 import matplotlib.pyplot as plt
-import neptune.new as neptune
+import neptune#.new as neptune
 
 import os, sys
 
@@ -34,6 +34,9 @@ import re
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+GMS_HOME = os.getenv('GMS_HOME')
+def get_gms_path(relative_path):
+    return os.path.join(GMS_HOME, relative_path)
 
 def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_converter, norm_dict, SEQ_LEN):
 
@@ -115,7 +118,7 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
             plt.plot(pred_wfs[i].squeeze(), label='generated')
             plt.legend()
             # run['test/gen_con_var'].log(f)
-            plt.savefig('./figures/wfs{}.png'.format(i), dpi=300, bbox_inches='tight')
+            plt.savefig(get_gms_path('/figures/wfs{}.png').format(i), dpi=300, bbox_inches='tight')
             plt.show()
             plt.close(f)
 
@@ -186,7 +189,7 @@ def extract_parameter_values(input_string, parameter_names):
 
 
 def eval(args):
-    log_path = '/scratch/gm/logs/GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=16-z_dim=8-lr=0.0006-weight:kl=0.08-log_reg=True-w_decay=5e-06-w_len=160-h_len=46-ncond=32-tcondvar=2-seed=3407' 
+    log_path = get_gms_path('/log/GM_V2_VAE_data5_dist-1_bs=128-rnn_size=32-z_dim=16-lr=0.0006-weightkl=0.2-log_reg=True-w_decay=5e-06-w_len=160-h_len=46-ncond=16-tcondvar=4-seed=3407') 
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
     parameter_values = extract_parameter_values(log_path, parameter_names)
         
@@ -203,7 +206,7 @@ def eval(args):
 
     time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
 
-    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
+    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
 
     # setup the model
     model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
@@ -222,8 +225,10 @@ def eval(args):
 
 
 def main(args, mc=None):
-
-    log_dir = '/scratch/gm/logs/GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0008-weight:kl=0.2-log_reg=True-w_decay=1e-05-w_len=160-h_len=46-ncond=16-tcondvar=2-seed=3407_NS' 
+    if not os.path.exists(args.checkpointFile):
+        raise FileNotFoundError("checkpoint file not found")
+    
+    log_dir = get_gms_path(args.checkpointFile) 
     
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
     parameter_values = extract_parameter_values(log_dir, parameter_names)
@@ -245,7 +250,7 @@ def main(args, mc=None):
         print('========================\n')
 
         time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
-        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
+        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
 
         # setup the model
         model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
@@ -293,8 +298,8 @@ def main(args, mc=None):
 
             print(np.vstack(real_wfs_list).shape)
             print(np.vstack(pred_wfs_list).shape)
-            np.save(f'/scratch/gm/gens/wfs_original_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_real.npy', np.transpose(np.vstack(real_wfs_list), (0, 2, 1)))
-            np.save(f'/scratch/gm/gens/wfs_generated_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_pred.npy', np.vstack(pred_wfs_list))
+            np.save(get_gms_path(f'/gens/wfs_original_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_real.npy'), np.transpose(np.vstack(real_wfs_list), (0, 2, 1)))
+            np.save(get_gms_path(f'/gens/wfs_generated_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_pred.npy'), np.vstack(pred_wfs_list))
     
         
 def set_seed(args):
@@ -308,13 +313,10 @@ def set_seed(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='training parameters')
-    parser.add_argument('--path', type=str, default='/scratch/gm/data/',
-                        help='data directory')  
-    parser.add_argument('--log_dir', type=str, default='/scratch/gm/logs',
-                        help='model saving directory')
-    parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
-                        help='computing device')
-    parser.add_argument('--epochs', type=int, default=3000, help='max epochs')
+    parser.add_argument('--path', type=str, default=get_gms_path('/data'), help='data directory')  
+    parser.add_argument('--log_dir', type=str, default=get_gms_path('/log'), help='model saving directory')  
+    parser.add_argument('--device', type=str, default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), help='computing device')
+    parser.add_argument('--epochs', type=int, default=5000, help='max epochs')
     parser.add_argument('--batch_size', type=int, default=64, help='batch size')
     parser.add_argument('--lr', type=float, default=3e-4, help='learning rate')
     parser.add_argument('--weight_decay', type=float, default=5e-6, help='weight decay')
@@ -334,6 +336,13 @@ if __name__ == '__main__':
     parser.add_argument('--power', type=int, default=1, help='power of the spectrogram')
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
+    #custom arguments
+    parser.add_argument('--checkpoint-file', type=str, dest='checkpointFile', \
+                        default=get_gms_path('GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.08-log_reg=True-w_decay=1e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407'), \
+                        help='checkpoint file name or path')  
+
     args = parser.parse_args()
     main(args)
 
+# GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.02-log_reg=True-w_decay=5e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407
+#python test_best_model.py --tcondvar 4 --batch-size 128 --path $GMS_HOME/data/ --log_dir $GMS_HOME/log/
