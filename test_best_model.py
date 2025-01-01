@@ -226,12 +226,12 @@ def eval(args):
 
 def main(args, mc=None):
     if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))):
-        checkPoint_file = get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))
+        checkpoint_file = get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))
     else:
         raise FileNotFoundError("checkpoint file not found")
     
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond", "bs"]
-    parameter_values = extract_parameter_values(checkPoint_file, parameter_names)
+    parameter_values = extract_parameter_values(checkpoint_file, parameter_names)
         
     fft_size = parameter_values['w_len']
     w_len = parameter_values['w_len']
@@ -257,7 +257,7 @@ def main(args, mc=None):
         model = torch.nn.DataParallel(model, device_ids=[args.device])
 
         state = dict(model=model)
-        state = restore_checkpoint(checkPoint_file, state, args.device)
+        state = restore_checkpoint(checkpoint_file, state, args.device)
         model = state['model']
         print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 
