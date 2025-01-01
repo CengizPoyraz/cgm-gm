@@ -225,10 +225,10 @@ def eval(args):
 
 
 def main(args, mc=None):
-    if not os.path.exists(args.checkPointFile):
-        raise FileNotFoundError("checkPoint file not found")
+    if not os.path.exists(args.checkpointFile):
+        raise FileNotFoundError("checkpoint file not found")
     
-    log_dir = get_gms_path(args.checkPointFile) 
+    log_dir = get_gms_path(args.checkpointFile) 
     
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
     parameter_values = extract_parameter_values(log_dir, parameter_names)
