@@ -189,20 +189,19 @@ def extract_parameter_values(input_string, parameter_names):
 
 
 def eval(args):
-    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))):
-        log_path = get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))
+    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpointFile))):
+        log_path = get_gms_path(os.path.join(args.log_dir, args.checkpointFile))
     else:
         raise FileNotFoundError("checkpoint file not found")
-    print(f"evaluating the checkpoint file ... [{log_path}]")
-    
-    parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
+        
+    parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond", "bs"]
     parameter_values = extract_parameter_values(log_path, parameter_names)
         
     fft_size = parameter_values['w_len']
     w_len = parameter_values['w_len']
     h_len = parameter_values['h_len']
     tcondvar = parameter_values['tcondvar']
-
+    batch_size = parameter_values['bs']
     z_dim = parameter_values['z_dim']
     z_rnn_dim = parameter_values['rnn_size']
     ncond = parameter_values['ncond']
@@ -211,7 +210,7 @@ def eval(args):
 
     time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
 
-    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
+    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar)
 
     # setup the model
     model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
@@ -230,21 +229,19 @@ def eval(args):
 
 
 def main(args, mc=None):
-    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))):
-        checkpoint_file = get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))
+    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpointFile))):
+        checkPointFile = get_gms_path(os.path.join(args.log_dir, args.checkpointFile))
     else:
         raise FileNotFoundError("checkpoint file not found")
-    print(f"evaluating the checkpoint file ... [{checkpoint_file}]")
-    
     
     parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
-    parameter_values = extract_parameter_values(checkpoint_file, parameter_names)
+    parameter_values = extract_parameter_values(checkPointFile, parameter_names)
         
     fft_size = parameter_values['w_len']
     w_len = parameter_values['w_len']
     h_len = parameter_values['h_len']
     tcondvar = parameter_values['tcondvar']
-
+    batch_size = parameter_values['bs']
     z_dim = parameter_values['z_dim']
     z_rnn_dim = parameter_values['rnn_size']
     ncond = parameter_values['ncond']
@@ -257,14 +254,14 @@ def main(args, mc=None):
         print('========================\n')
 
         time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
-        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=args.batch_size, tcondvar=tcondvar)
+        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.dataFile, args.idxFile, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar)
 
         # setup the model
         model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
         model = torch.nn.DataParallel(model, device_ids=[args.device])
 
         state = dict(model=model)
-        state = restore_checkpoint(checkpoint_file, state, args.device)
+        state = restore_checkpoint(checkPointFile, state, args.device)
         model = state['model']
         print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 
@@ -344,9 +341,9 @@ if __name__ == '__main__':
     parser.add_argument('--fft_size', type=int, default=160, help='fft size')
 
     #custom arguments
-    parser.add_argument('--data_file', type=str, dest='data_file', default='data.csv', help='data file name or path')  
-    parser.add_argument('--idx_file', type=str, dest='idx_file', default='idx.npy', help='idx file name or path')  
-    parser.add_argument('--checkpoint_file', type=str, dest='checkpoint_file', \
+    parser.add_argument('--data-file', type=str, dest='dataFile', default='data.csv', help='data file name or path')  
+    parser.add_argument('--idx-file', type=str, dest='idxFile', default='idx.npy', help='idx file name or path')  
+    parser.add_argument('--checkpoint-file', type=str, dest='checkpointFile', \
                         default=get_gms_path('GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.08-log_reg=True-w_decay=1e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407'), \
                         help='checkpoint file name')  
 
