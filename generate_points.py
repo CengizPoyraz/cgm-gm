@@ -188,7 +188,7 @@ cond_var_dict = {0: ['mag', 'rup', 'angle'],
                  3: ['mag', 'depth'],
                  4: ['mag', 'rup', 'depth']}
 
-log_path = get_gms_path('log/GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0008-weight:kl=0.2-log_reg=True-w_decay=1e-05-w_len=160-h_len=46-ncond=16-tcondvar=2-seed=3407')
+log_path = get_gms_path('log/GM_V2_VAE_data5_dist-5000_bs=256-rnn_size=32-z_dim=32-lr=0.0008-weight:kl=0.02-log_reg=True-w_decay=1e-05-w_len=160-h_len=46-ncond=16-tcondvar=4-seed=3407')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
 parameter_values = extract_parameter_values(log_path, parameter_names)
