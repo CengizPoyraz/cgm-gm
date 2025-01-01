@@ -10,7 +10,7 @@ import os, sys
 import math
 
 import torch
-import cupy as np
+import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
