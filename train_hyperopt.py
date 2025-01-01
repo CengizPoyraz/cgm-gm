@@ -441,7 +441,7 @@ if __name__ == '__main__':
     else:
         if args.enable_tensorboard:
             from torch.utils.tensorboard import SummaryWriter
-            writer = SummaryWriter(get_gms_path("/log"))
+            writer = SummaryWriter()
         
         def get_experiment_space():
             space = {  # Architecture parameters
