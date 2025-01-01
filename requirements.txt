@@ -2,7 +2,7 @@ geopy==2.3.0
 h5py==3.9.0
 hyperopt==0.2.7
 matplotlib==3.7.2
-neptune==1.10.4
+neptune==1.13.0
 numpy==1.25.2
 pandas==2.0.3
 pygmt==0.12.0
