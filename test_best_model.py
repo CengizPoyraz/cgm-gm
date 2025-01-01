@@ -234,7 +234,7 @@ def main(args, mc=None):
     else:
         raise FileNotFoundError("checkpoint file not found")
     
-    parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond"]
+    parameter_names = ["rnn_size", "z_dim", "w_len", "h_len", "tcondvar", "ncond", "bs"]
     parameter_values = extract_parameter_values(checkPoint_file, parameter_names)
         
     fft_size = parameter_values['w_len']
