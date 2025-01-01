@@ -114,7 +114,7 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
             plt.plot(pred_wfs[i].squeeze(), label='generated')
             plt.legend()
             # run['test/gen_con_var'].log(f)
-            plt.savefig(get_gms_path('/figures/wfs{}.png').format(i), dpi=300, bbox_inches='tight')
+            plt.savefig(get_gms_path('figures/wfs{}.png').format(i), dpi=300, bbox_inches='tight')
             plt.show()
             plt.close(f)
 
@@ -185,8 +185,8 @@ def extract_parameter_values(input_string, parameter_names):
 
 
 def eval(args):
-    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))):
-        log_path = get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))
+    if os.path.exists(get_gms_path(args.log_dir, args.checkpoint_file)):
+        log_path = get_gms_path(args.log_dir, args.checkpoint_file)
     else:
         raise FileNotFoundError("checkpoint file not found")
         
@@ -225,8 +225,8 @@ def eval(args):
 
 
 def main(args, mc=None):
-    if os.path.exists(get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))):
-        checkpoint_file = get_gms_path(os.path.join(args.log_dir, args.checkpoint_file))
+    if os.path.exists(get_gms_path(args.log_dir, args.checkpoint_file)):
+        checkpoint_file = get_gms_path(args.log_dir, args.checkpoint_file)
     else:
         raise FileNotFoundError("checkpoint file not found")
     
