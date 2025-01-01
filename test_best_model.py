@@ -252,9 +252,11 @@ def main(args, mc=None):
         _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar)
 
         # setup the model
+        print("Setting up the model...")
         model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
         model = torch.nn.DataParallel(model, device_ids=[args.device])
 
+        print("Restoring the checkpoint ...")
         state = dict(model=model)
         state = restore_checkpoint(checkpoint_file, state, args.device)
         model = state['model']
@@ -265,6 +267,7 @@ def main(args, mc=None):
         wfs_min, wfs_max = norm_dict['log_wfs']
         griffinlim = torchaudio.transforms.GriffinLim(n_fft=fft_size, n_iter=500, win_length=w_len, hop_length=h_len, power=1).to(args.device)
 
+        print("Evaluating the model ...")
         model.eval()
         real_wfs_list, pred_wfs_list = [], []
         
@@ -277,15 +280,17 @@ def main(args, mc=None):
                 pred_wfs_sub_lst = []
                 prev = None
                 
+                print("Generating random samples ...")
                 # generate 100 random samples for each set of conditional variables
                 for _ in range(100):
+                    print(f"{_}. module generating ..")
                     pred_wfs = model.module.generate(cond_var, SEQ_LEN)
                     pred_wfs = pred_wfs.permute(0, 2, 1)
                     pred_wfs = min_max_norm(pred_wfs, wfs_min, wfs_max, '[0,1]', 'add')
                     pred_wfs = torch.pow(10, pred_wfs) - eps
-
+                    print("running griffinlim ...")
                     pred_wfs = griffinlim(pred_wfs)
-
+                    print("appending to list ...")
                     # pred_wfs = time_spec_converter.spec_to_time(pred_wfs*torch.exp(1j * true_phase.to(args.device))).unsqueeze(dim=-1).detach()
                     pred_wfs_sub_lst.append(pred_wfs.cpu().numpy())
                     # if prev is not None:
