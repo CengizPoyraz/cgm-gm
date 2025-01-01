@@ -4,7 +4,7 @@ Train function
 
 import argparse
 import time
-import neptune #.new as neptune
+import neptune
 
 import os, sys
 import math
