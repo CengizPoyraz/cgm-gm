@@ -1,7 +1,6 @@
 **/.venv
-**/__pycache
-/metrics/__pycache__/*
-/utils/__pycache__/*
+__pycache__/
+*.py[cod]
 /.neptune/*
 *.pyc
 **/.ipynb_checkpoints
