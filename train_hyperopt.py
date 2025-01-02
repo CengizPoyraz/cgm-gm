@@ -5,6 +5,7 @@ Train function
 import argparse
 import time
 import neptune
+from neptune.utils import stringify_unsupported
 
 import os, sys
 import math
@@ -371,7 +372,7 @@ def main(args, mc):
         tags=[args.tag],
         mode=args.neptune
     )  # your credentials
-    run['config/hyperparameters'] = vars(args)
+    run['config/hyperparameters'] = stringify_unsupported(vars(args))
 
     # setup the model
     model = cVAE(in_dim=args.fft_size, z_dim=args.z_dim, ncond=args.ncond, z_rnn_dim=args.z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
