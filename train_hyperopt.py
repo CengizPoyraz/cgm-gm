@@ -310,7 +310,7 @@ class TimeSpecConverter:
         return self.griffinlim(wfs)
         
 def summary(args):
-    from torchinfo import summary as torchinfosummary    
+    from torchinfo import summary as model_summary    
 
     # setup the model
     model = cVAE(in_dim=args.fft_size, z_dim=args.z_dim, ncond=args.ncond, z_rnn_dim=args.z_rnn_dim, in_size=3).to(args.device)
@@ -319,7 +319,7 @@ def summary(args):
     print('Model Summary')
     print('=================================================================')
     
-    torchinfosummary(model)
+    model_summary(model)
 
 def main(args, mc):
 
