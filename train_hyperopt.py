@@ -430,6 +430,7 @@ if __name__ == '__main__':
     #custom arguments
     parser.add_argument('--data_file', type=str, dest='data_file', default='data.csv', help='data file name or path')  
     parser.add_argument('--idx_file', type=str, dest='idx_file', default='idx.npy', help='idx file name or path')  
+    parser.add_argument('--loc', type=str, dest='loc', default='EW', help='location') 
     parser.add_argument('--only_summary', dest='only_summary', action=argparse.BooleanOptionalAction, help='model summary')
     parser.add_argument('--enable_tensorboard', dest='enable_tensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
 
