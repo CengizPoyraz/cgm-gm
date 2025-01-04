@@ -80,7 +80,7 @@ The evaluations include the comparisons of waveform shapes, P and S arrival time
 
 ### Docker Repositories
 ```console
-docker pull cpoyraz/gms:v3.3
+docker pull cpoyraz/gms:v3.4
 ```
 
 ## License
