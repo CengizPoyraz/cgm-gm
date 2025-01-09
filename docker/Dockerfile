@@ -22,9 +22,11 @@ RUN (type -p wget >/dev/null || ( apt update &&  apt-get install wget -y)) \
 	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" |  tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
 	&&  apt update \
 	&&  apt install gh -y
+
+ENV DEBIAN_FRONTEND= 
+
 RUN git clone $GMS_GIT_URL $GMS_HOME
 RUN pip install -r $GMS_HOME/requirements.txt
-
 # in case you prefer to use venv
 # RUN python -m venv $GMS_HOME/.venv 
 # RUN source $GMS_HOME/.venv/bin/activate

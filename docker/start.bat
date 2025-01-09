@@ -1,0 +1,1 @@
+docker run -it --mount type=bind,src=//c/Users/cengi/DockerMount,target=/home/root/host --gpus all cpoyraz/gms:v3.4 bash
