@@ -109,6 +109,8 @@ def train(args, model, train_loader, run, norm_dict, time_spec_converter):
 
             optimizer.zero_grad()
             l.backward()
+
+            torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_value)
             optimizer.step()
 
             # record the loss
@@ -431,8 +433,10 @@ if __name__ == '__main__':
     parser.add_argument('--data_file', type=str, dest='data_file', default='data.csv', help='data file name or path')  
     parser.add_argument('--idx_file', type=str, dest='idx_file', default='idx.npy', help='idx file name or path')  
     parser.add_argument('--loc', type=str, dest='loc', default='EW', help='location') 
+    parser.add_argument('--clip_value', type=float, default=1, help='clip value')
     parser.add_argument('--only_summary', dest='only_summary', action=argparse.BooleanOptionalAction, help='model summary')
     parser.add_argument('--enable_tensorboard', dest='enable_tensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
+
 
     args = parser.parse_args()
     if args.only_summary:
@@ -445,9 +449,9 @@ if __name__ == '__main__':
         def get_experiment_space():
             space = {  # Architecture parameters
                 'model': 'vae',
-                'lr': hp.choice('lr', [8e-4, 7e-4, 6e-4]),
-                'z_rnn_dim': hp.choice('z_rnn_dim', [16, 32]),
-                'z_dim': hp.choice('z_dim', [8, 16, 32]),
+                'lr': hp.choice('lr', [8e-8, 7e-7, 6e-6, 5e-5, 4e-4, 3e-3]),
+                'z_rnn_dim': hp.choice('z_rnn_dim', [32]),
+                'z_dim': hp.choice('z_dim', [16]),
                 'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),
                 'weight_decay': hp.choice('weight_decay', [5e-6, 1e-5, 1e-6]),
                 'alpha': hp.choice('alpha', [0.01, 0.05, 0.1]),
