@@ -28,7 +28,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
   
   Args:
     - ori_data: original data
-    - generated_datvisualization(real_wfs_list, pred_wfs_list, 'pca', args, run)a: generated synthetic data
+    - generated_datvisualization(real_wfs_list, pred_wfs_list, 'pca', args, run): generated synthetic data
     - analysis: tsne or pca
   """  
   # Analysis sample size (for faster computation)
@@ -87,6 +87,8 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
     # Do t-SNE Analysis together       
     prep_data_final = np.concatenate((prep_data, prep_data_hat), axis = 0)
     
+    print(f'[tsne] prep_data_final check -> NaN exists: {np.any(np.isnan(prep_data_final))}')
+
     # TSNE anlaysis
     tsne = TSNE(n_components = 2, verbose = 1, perplexity = 40, n_iter = 300)
     tsne_results = tsne.fit_transform(prep_data_final)
