@@ -302,8 +302,8 @@ def main(args, mc=None):
 
             print(np.vstack(real_wfs_list).shape)
             print(np.vstack(pred_wfs_list).shape)
-            np.save(get_gms_path(f'/gens/wfs_original_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_real.npy'), np.transpose(np.vstack(real_wfs_list), (0, 2, 1)))
-            np.save(get_gms_path(f'/gens/wfs_generated_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_pred.npy'), np.vstack(pred_wfs_list))
+            np.save(get_gms_path(f'/gens/wfs_original_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_{args.loc}_real.npy'), np.transpose(np.vstack(real_wfs_list), (0, 2, 1)))
+            np.save(get_gms_path(f'/gens/wfs_generated_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_{args.loc}_pred.npy'), np.vstack(pred_wfs_list))
     
         
 def set_seed(args):
