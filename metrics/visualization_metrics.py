@@ -41,14 +41,17 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
   generated_data = np.asarray(generated_data)  
   
   print(f'[raw] ori_data check -> shape={ori_data.shape} NaN exists: {np.any(np.isnan(ori_data))} Nan count: {np.count_nonzero(np.isnan(ori_data))}')
+  print(f'[raw] ori_data sample={generated_data[0]}')
   print(f'[raw] generated_data check -> shape={generated_data.shape} NaN exists: {np.any(np.isnan(generated_data))} Nan count: {np.count_nonzero(np.isnan(generated_data))}')
+  print(f'[raw] generated_data sample={generated_data[0]}')
 
   ori_data = ori_data[idx]
   generated_data = generated_data[idx]
   
   print(f'[idx] ori_data check -> shape={ori_data.shape} NaN exists: {np.any(np.isnan(ori_data))} Nan count: {np.count_nonzero(np.isnan(ori_data))}')
+  print(f'[idx] ori_data sample={ori_data[0]}')
   print(f'[idx] generated_data check -> shape={generated_data.shape} NaN exists: {np.any(np.isnan(generated_data))} Nan count: {np.count_nonzero(np.isnan(generated_data))}')
-
+  print(f'[idx] generated_data sample={generated_data[0]}')
   no, seq_len, dim = ori_data.shape  
   
   for i in range(anal_sample_no):
