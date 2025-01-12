@@ -114,7 +114,7 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
             plt.plot(pred_wfs[i].squeeze(), label='generated')
             plt.legend()
             # run['test/gen_con_var'].log(f)
-            plt.savefig(get_gms_path('figures/wfs{}.png').format(i), dpi=300, bbox_inches='tight')
+            plt.savefig(get_gms_path(f'figures/wfs{i}_{args.loc}.png'), dpi=300, bbox_inches='tight')
             plt.show()
             plt.close(f)
 
