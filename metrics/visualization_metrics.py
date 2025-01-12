@@ -28,7 +28,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
   
   Args:
     - ori_data: original data
-    - generated_datvisualization(real_wfs_list, pred_wfs_list, 'pca', args, run): generated synthetic data
+    - generated_data: generated synthetic data
     - analysis: tsne or pca
   """  
   # Analysis sample size (for faster computation)

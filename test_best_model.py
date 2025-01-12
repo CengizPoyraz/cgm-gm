@@ -20,6 +20,8 @@ from train_hyperopt import TimeSpecConverter
 
 from utils.utils_vis import plt_ori_vs_gen, plt_ori_vs_rec
 from metrics.discrimanitive import discriminative_score_metrics
+from metrics.visualization_metrics import visualization
+
 import logging
 import torchaudio
 
@@ -50,8 +52,6 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
 
         real_wfs_list = np.transpose(np.concatenate(tuple(real_wfs_list), axis=0), (0, 2, 1))
         pred_wfs_list = np.transpose(np.concatenate(tuple(pred_wfs_list), axis=0), (0, 2, 1))
-
-        from metrics.visualization_metrics import visualization
 
         real_wfs_list = time_spec_converter.time_to_spec(torch.Tensor(real_wfs_list).squeeze().to(args.device)).permute(0, 2, 1).detach().cpu()
         _, real_wfs_list = get_phase_mag(real_wfs_list)
@@ -89,7 +89,6 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
         visualization(real_wfs_list, pred_wfs_list, 'tsne', args, run)
         plt_ori_vs_rec(wfs_orig, wfs_hat, run)
 
-        import matplotlib.pyplot as plt
         test_loader_iter = iter(test_loader)
         _, cond_var, true_phase, wfs = next(test_loader_iter)
         
@@ -301,8 +300,8 @@ def main(args, mc=None):
 
             print(np.vstack(real_wfs_list).shape)
             print(np.vstack(pred_wfs_list).shape)
-            np.save(get_gms_path(f'/gens/wfs_original_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_{args.loc}_real.npy'), np.transpose(np.vstack(real_wfs_list), (0, 2, 1)))
-            np.save(get_gms_path(f'/gens/wfs_generated_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_{args.loc}_pred.npy'), np.vstack(pred_wfs_list))
+            np.save(get_gms_path(f'gens/wfs_original_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_{args.loc}_real.npy'), np.transpose(np.vstack(real_wfs_list), (0, 2, 1)))
+            np.save(get_gms_path(f'gens/wfs_generated_samples_hlen{h_len}_wlen{w_len}_rnndim{z_rnn_dim}_zdim{z_dim}_{args.loc}_pred.npy'), np.vstack(pred_wfs_list))
     
         
 def set_seed(args):
@@ -347,10 +346,26 @@ if __name__ == '__main__':
                         default=get_gms_path('GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.08-log_reg=True-w_decay=1e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407'), \
                         help='checkpoint file name')  
     parser.add_argument('--only_eval', dest='only_eval', default=False, action=argparse.BooleanOptionalAction, help='just run eval()')
+    parser.add_argument('--only_visualization', dest='only_visualization', default=False, action=argparse.BooleanOptionalAction, help='just visualization')
+    parser.add_argument('--real_wfs_file', type=str, dest='real_wfs_file', default='real_wfs_file.csv', help='real wfs file')  
+    parser.add_argument('--pred_wfs_file', type=str, dest='pred_wfs_file', default='pred_wfs_file.csv', help='predicted wfs file')  
+    
+    
 
     args = parser.parse_args()
     if args.only_eval:
         eval(args)
+    elif args.only_visualization:
+        if not os.path.exists(get_gms_path(args.real_wfs_file)):
+            logging.warning(f"No real wfs file found")
+            exit
+        if not os.path.exists(get_gms_path(args.pred_wfs_file)):
+            logging.warning(f"No pred wfs file found")
+            exit
+        real_wfs_list = np.load(get_gms_path(args.real_wfs_file))
+        pred_wfs_list = np.load(get_gms_path(args.pred_wfs_file))
+        run = None
+        visualization(real_wfs_list, pred_wfs_list, 'tsne', args, run)
     else:
         main(args)
     
