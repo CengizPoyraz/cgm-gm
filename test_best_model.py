@@ -347,7 +347,11 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_file', type=str, dest='checkpoint_file', \
                         default=get_gms_path('GM_V2_VAE_data5_dist-5000_bs=128-rnn_size=32-z_dim=32-lr=0.0006-weight:kl=0.08-log_reg=True-w_decay=1e-06-w_len=160-h_len=46-ncond=32-tcondvar=4-seed=3407'), \
                         help='checkpoint file name')  
+    parser.add_argument('--only_eval', dest='only_eval', default=False, action=argparse.BooleanOptionalAction, help='just run eval()')
 
     args = parser.parse_args()
-    main(args)
+    if args.only_eval:
+        eval(args)
+    else:
+        main(args)
     
