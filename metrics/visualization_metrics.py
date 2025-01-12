@@ -87,7 +87,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
     # Do t-SNE Analysis together       
     prep_data_final = np.concatenate((prep_data, prep_data_hat), axis = 0)
     
-    print(f'[tsne] prep_data_final check -> NaN exists: {np.any(np.isnan(prep_data_final))}')
+    print(f'[tsne] prep_data_final check -> NaN exists: {np.any(np.isnan(prep_data_final))} Nan count: {np.count_nonzero(np.isnan(prep_data_final))}')
 
     # TSNE anlaysis
     tsne = TSNE(n_components = 2, verbose = 1, perplexity = 40, n_iter = 300)
