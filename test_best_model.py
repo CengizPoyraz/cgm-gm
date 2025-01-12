@@ -152,7 +152,6 @@ def collect_real_and_gen(args, model, loader, pred_wfs_list, real_wfs_list, SEQ_
 
 
 def save_checkpoint(ckpt_dir, state):
-    import torch
     saved_state = {
     'model': state['model'].state_dict(),
     }
