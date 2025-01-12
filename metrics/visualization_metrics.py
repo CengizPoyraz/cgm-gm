@@ -34,14 +34,21 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
   # Analysis sample size (for faster computation)
   anal_sample_no = min([1000, len(ori_data)])
   idx = np.random.permutation(len(ori_data))[:anal_sample_no]
-    
+  
+
   # Data preprocessing
   ori_data = np.asarray(ori_data)
   generated_data = np.asarray(generated_data)  
   
+  print(f'[raw] ori_data check -> shape={ori_data.shape} NaN exists: {np.any(np.isnan(ori_data))} Nan count: {np.count_nonzero(np.isnan(ori_data))}')
+  print(f'[raw] generated_data check -> shape={generated_data.shape} NaN exists: {np.any(np.isnan(generated_data))} Nan count: {np.count_nonzero(np.isnan(generated_data))}')
+
   ori_data = ori_data[idx]
   generated_data = generated_data[idx]
   
+  print(f'[idx] ori_data check -> shape={ori_data.shape} NaN exists: {np.any(np.isnan(ori_data))} Nan count: {np.count_nonzero(np.isnan(ori_data))}')
+  print(f'[idx] generated_data check -> shape={generated_data.shape} NaN exists: {np.any(np.isnan(generated_data))} Nan count: {np.count_nonzero(np.isnan(generated_data))}')
+
   no, seq_len, dim = ori_data.shape  
   
   for i in range(anal_sample_no):
