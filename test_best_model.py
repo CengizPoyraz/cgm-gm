@@ -356,10 +356,10 @@ if __name__ == '__main__':
     if args.only_eval:
         eval(args)
     elif args.only_visualization:
-        if not os.path.exists(get_gms_path(args.real_wfs_file)):
+        if not os.path.isfile(get_gms_path(args.real_wfs_file)):
             logging.warning(f"No real wfs file found")
             exit
-        if not os.path.exists(get_gms_path(args.pred_wfs_file)):
+        if not os.path.isfile(get_gms_path(args.pred_wfs_file)):
             logging.warning(f"No pred wfs file found")
             exit
         real_wfs_list = np.load(get_gms_path(args.real_wfs_file))
