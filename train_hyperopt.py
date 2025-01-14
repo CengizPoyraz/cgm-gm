@@ -184,8 +184,8 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
         cond_var = cond_var.to(args.device).float()
         wfs_hat, _, _ = model(wfs, cond_var)
 
-        wfs = min_max_norm(wfs, wfs_min, wfs_max, '[0,1]', 'add')
-        wfs_hat = min_max_norm(wfs_hat, wfs_min, wfs_max, '[0,1]', 'add')
+        wfs = min_max_norm(wfs, wfs_min, wfs_max, '[0,1]', 'std')
+        wfs_hat = min_max_norm(wfs_hat, wfs_min, wfs_max, '[0,1]', 'std')
 
         eps = 1e-10
         
@@ -200,7 +200,7 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
         wfs_hat = time_spec_converter.spec_to_time(conv_input_hat).unsqueeze(dim=-1).detach().cpu()
 
         pred_wfs_list = torch.Tensor(pred_wfs_list)
-        pred_wfs_list = min_max_norm(pred_wfs_list, wfs_min, wfs_max, '[0,1]', 'add')
+        pred_wfs_list = min_max_norm(pred_wfs_list, wfs_min, wfs_max, '[0,1]', 'std')
         pred_wfs_list = torch.pow(10, pred_wfs_list) - eps
         
         wfs_gen = time_spec_converter.spec_to_time(pred_wfs_list.permute(0, 2, 1).to(args.device)*torch.exp(1j * true_phase_list.to(args.device))).unsqueeze(dim=-1).detach().cpu()
@@ -218,7 +218,7 @@ def eval_metrics(args, model, test_loader, all_set, all_loader, run, time_spec_c
         cond_var = cond_var.to(args.device).float()
 
         pred_wfs = model.module.generate(cond_var, SEQ_LEN)  # [679,3,6000]
-        pred_wfs = min_max_norm(pred_wfs, wfs_min, wfs_max, '[0,1]', 'add')
+        pred_wfs = min_max_norm(pred_wfs, wfs_min, wfs_max, '[0,1]', 'std')
 
         # transform amplitude to original signal
         pred_wfs = torch.pow(10, pred_wfs) - eps
