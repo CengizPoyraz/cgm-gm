@@ -82,6 +82,7 @@ def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs
     # temp code line //todo:
     wfs_min, wfs_max = wfs.min(), wfs.max()
     wfs = (wfs - wfs_min) / (wfs_max - wfs_min)
+    print(f"[load_data] wfs.shape={wfs.shape}")
 
     # cut waveforms to 6000, delete the first 1000 samples
     wfs = wfs[:, np.newaxis, (1000):] # [5108, 1, 6000]
