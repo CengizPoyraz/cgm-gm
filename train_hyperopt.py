@@ -449,12 +449,12 @@ if __name__ == '__main__':
         def get_experiment_space():
             space = {  # Architecture parameters
                 'model': 'vae',
-                'lr': hp.choice('lr', [1e-5, 1e-4, 1e-3]),
+                'lr': hp.choice('lr', [1e-3]),
                 'z_rnn_dim': hp.choice('z_rnn_dim', [32]),
                 'z_dim': hp.choice('z_dim', [16]),
                 'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),
                 'weight_decay': hp.choice('weight_decay', [5e-6, 1e-5, 1e-6]),
-                'alpha': hp.choice('alpha', [0.01, 0.05, 0.1]),
+                'alpha': hp.choice('alpha', [0.01*10, 0.05*10, 0.1*10]),
                 'ncond': hp.choice('ncond', [16, 32]),
                 'log_reg': True, # hp.choice('log_reg', [True, False]),
 
