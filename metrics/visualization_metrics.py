@@ -21,8 +21,8 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import numpy as np
-from gms_util import get_gms_path
-   
+from gms.gms_utils import get_gms_path
+  
 def visualization (ori_data, generated_data, analysis, args, run=None):
   """Using PCA or tSNE for generated and original data visualization.
   

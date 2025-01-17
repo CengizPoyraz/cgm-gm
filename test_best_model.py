@@ -32,7 +32,7 @@ import numpy as np
 import json
 
 import re
-from gms_util import get_gms_path
+from gms.gms_utils import get_gms_path
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

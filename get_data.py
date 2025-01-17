@@ -78,12 +78,6 @@ def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs
     # get the time series data
     wfs = data.iloc[:, 14:].to_numpy() # [5108, 7000]
 
-
-    # temp code line //todo:
-    wfs_min, wfs_max = wfs.min(), wfs.max()
-    wfs = (wfs - wfs_min) / (wfs_max - wfs_min)
-    print(f"[load_data] wfs.shape={wfs.shape}")
-
     # cut waveforms to 6000, delete the first 1000 samples
     wfs = wfs[:, np.newaxis, (1000):] # [5108, 1, 6000]
     time_serie_len = wfs.shape[-1]
@@ -118,6 +112,8 @@ def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs
 
     wfs_min, wfs_max = wfs.min(), wfs.max()
     wfs = min_max_norm(wfs, wfs_min, wfs_max, '[0,1]', 'sub')
+    print(f"[load_data] wfs.shape={wfs.shape}")
+
     norm_dict['log_wfs'] = [wfs_min, wfs_max]
 
     cond_var = np.concatenate(cond_vars, axis=1) # [5108, len(cond_var_dict[tcondvar])]
@@ -210,8 +206,6 @@ def min_max_norm(x, x_min, x_max, range='[0,1]', mode='add'):
             return (x - x_min) / (x_max - x_min)
         elif mode == 'add':
             return x * (x_max - x_min) + x_min
-        elif mode == 'std':
-            return (x - np.mean(x)) / np.std(x)
         else:
             raise NotImplementedError
 
@@ -220,7 +214,9 @@ def min_max_norm(x, x_min, x_max, range='[0,1]', mode='add'):
             return 2.0 * ((x - x_min) / (x_max - x_min)) - 1.0
         elif mode == 'add':
             x = (x + 1.0) / 2.0
-            return x * (x_max - x_min) + x_min        
+            return x * (x_max - x_min) + x_min
+        elif mode == 'std':
+            return (x - np.mean(x)) / np.std(x)        
         else:
             raise NotImplementedError
 

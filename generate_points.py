@@ -15,7 +15,7 @@ from sklearn.metrics.pairwise import haversine_distances
 from math import radians
 from geopy import distance
 import os
-from gms_util import get_gms_path
+from gms.gms_utils import get_gms_path
 
 def min_max_norm(x, x_min, x_max, range='[0,1]', mode='add'):
 
