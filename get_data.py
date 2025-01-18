@@ -15,36 +15,39 @@ import os
 from gms.gms_preprocessor import WaveformPreprocessor
 
 def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0, loc='EW'):
-    """
-    Load and preprocess waveform data with consistent signature
-    
-    Args:
-        path: Base data directory path
-        data_file_path: Path to data CSV file
-        idx_file_path: Path to index file
-        time_spec_converter: Not used, kept for signature compatibility
-        train_bs: Training batch size
-        test_bs: Testing batch size
-        tcondvar: Selection of conditional variables
-        loc: Location string
+    '''
+    Arguments
+    =========
+        path: file path to data directory
+        data_file_path: file path to the dataset (csv file).
+        idx_file_path: file path to the idx formatted file (npy file).
+        time_spec_converter: STFT and inverse STFT (kept for compatibility)
+        train_bs: batch size for training
+        test_bs: batch size for testing
+        tcondvar: selection of conditional variables
+        loc: location string
         
-    Returns:
-        train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len
-    """
+    Returns
+    =======
+        datasets, dataloader, norm_dict, and time_series_len
+        norm_dict: a dictionary saving all normalization factors
+        time_series_len: length of time series
+    '''
+
     print('========================')
     print('Loading data...')
     print('========================\n')
 
-    # Initialize preprocessor
+    # Initialize WaveformPreprocessor
     preprocessor = WaveformPreprocessor(
-        window_length=160,  # These could be made parameters if needed
+        window_length=160,  # Could be parametrized if needed
         hop_length=46,
         n_fft=160,
         power=1,
         device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     )
 
-    # Load data file
+    # Set up data paths
     if data_file_path is None:
         data_file_path = os.path.join(path, f'Time_Series_Data_v5_{loc}.csv')
     else:
@@ -55,9 +58,9 @@ def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_conv
         idx_file_path = os.path.join(path, idx_file_path)
 
     print(f"data file: {data_file_path}, idx file: {idx_file_path}")
-    data = pd.read_csv(data_file_path)
     
-    # Apply index file if exists
+    # Load data
+    data = pd.read_csv(data_file_path)
     if os.path.exists(idx_file_path):
         ridx = np.load(idx_file_path)
         if len(ridx) == data.shape[0]:
@@ -76,7 +79,8 @@ def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_conv
     info['angle'] = angle
 
     # Extract waveforms and remove first 1000 samples
-    wfs = data.iloc[:, 14:].to_numpy()[:, 1000:]  # Remove first 1000 samples
+    wfs = data.iloc[:, 14:].to_numpy()
+    wfs = wfs[:, np.newaxis, 1000:]  # Remove first 1000 samples and add channel dimension
     time_serie_len = wfs.shape[-1]
     
     sampling_freq = info['Sampling Frequency'].iloc[0]
@@ -104,55 +108,27 @@ def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_conv
         cv = min_max_norm(cv, cv_min, cv_max, '[0,1]', 'sub')
         cond_vars.append(cv)
 
-    # Process waveforms in batches
-    batch_size = 100
-    total_samples = len(wfs)
-    all_magnitudes = []
-    all_phases = []
-    all_norm_dicts = []
-    
-    print(f"\nProcessing {total_samples} waveforms in batches of {batch_size}")
-    
-    for i in range(0, total_samples, batch_size):
-        end_idx = min(i + batch_size, total_samples)
-        batch = wfs[i:end_idx]
-        
-        try:
-            print(f"Processing batch {i//batch_size + 1}/{(total_samples + batch_size - 1)//batch_size}")
-            magnitudes, phases, batch_norm_dict = preprocessor.batch_process(
-                batch,
-                sampling_freq=sampling_freq,
-                validate=False
-            )
-            
-            if magnitudes is not None and len(magnitudes) > 0:
-                all_magnitudes.append(magnitudes)
-                all_phases.append(phases)
-                all_norm_dicts.append(batch_norm_dict)
-            
-        except Exception as e:
-            print(f"Error processing batch {i//batch_size + 1}: {str(e)}")
-            continue
-    
-    if not all_magnitudes:
-        raise RuntimeError("No waveforms were successfully processed")
-    
-    # Combine results
-    magnitudes = torch.cat(all_magnitudes, dim=0)
-    phases = torch.cat(all_phases, dim=0)
-    
+    # Process waveforms using WaveformPreprocessor
+    print("Processing waveforms with WaveformPreprocessor...")
+    try:
+        magnitudes, phases, wf_norm_dict = preprocessor.batch_process(
+            waveforms=wfs.squeeze(),  # Remove channel dimension for processing
+            sampling_freq=sampling_freq,
+            validate=False
+        )
+    except Exception as e:
+        print(f"Error processing waveforms: {str(e)}")
+        raise
+
     # Update norm_dict with waveform normalization
-    norm_dict['log_wfs'] = [
-        min(d['wf_min'] for d in all_norm_dicts),
-        max(d['wf_max'] for d in all_norm_dicts)
-    ]
+    norm_dict['log_wfs'] = [wf_norm_dict['wf_min'], wf_norm_dict['wf_max']]
 
     # Combine conditional variables
     cond_var = np.concatenate(cond_vars, axis=1)
-    cond_var = torch.from_numpy(cond_var)
+    cond_var = torch.from_numpy(cond_var).float()
     
     # Convert waveforms to tensor
-    wfs = torch.from_numpy(wfs).unsqueeze(1).float()  # Add channel dimension
+    wfs = torch.from_numpy(wfs).float()
 
     # Split into train/test sets
     length = len(magnitudes)
@@ -183,7 +159,7 @@ def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_conv
     
     test_loader = DataLoader(
         TensorDataset(*test_set),
-        batch_size=test_bs,
+        batch_size=test_bs, 
         shuffle=True
     )
     
@@ -195,6 +171,7 @@ def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_conv
 
     return (train_set, test_set, all_set, train_loader, test_loader,
             all_loader, norm_dict, time_serie_len)
+
  
 def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0, loc='EW'):
     '''
