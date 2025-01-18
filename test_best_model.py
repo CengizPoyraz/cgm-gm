@@ -204,7 +204,7 @@ def eval(args):
 
     time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
 
-    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar)
+    _, _, all_set, _, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar, loc=args.loc)
 
     # setup the model
     model = cVAE(in_dim=fft_size, z_dim=z_dim, ncond=ncond, z_rnn_dim=z_rnn_dim, in_size=len(norm_dict)-1).to(args.device)
@@ -247,7 +247,7 @@ def main(args, mc=None):
         print('========================\n')
 
         time_spec_converter = TimeSpecConverter(n_fft=fft_size, w_len=w_len, h_len=h_len, power=1, device=args.device)
-        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar)
+        _, _, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter, train_bs=batch_size, tcondvar=tcondvar, loc=args.loc)
 
         # setup the model
         print("Setting up the model...")

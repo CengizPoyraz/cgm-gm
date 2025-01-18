@@ -14,7 +14,7 @@ import torchaudio
 import os
 
 
-def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0):
+def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs=32, test_bs=32, tcondvar=0, loc='EW'):
     '''
     Arguments
     =========
@@ -31,8 +31,6 @@ def load_data(path, data_file_path, idx_file_path, time_spec_converter, train_bs
         norm_dict: a dictionary saving all normalization factors
         time_series_len: length of time series
     '''
-
-    loc = 'EW'
 
     if data_file_path is None:
         data_file_path = os.path.join(path, f'Time_Series_Data_v5_{loc}.csv')

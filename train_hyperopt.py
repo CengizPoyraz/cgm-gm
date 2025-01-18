@@ -364,7 +364,7 @@ def main(args, mc):
     print('Loading data...')
     print('========================\n')
     
-    train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter=time_spec_converter, train_bs=args.batch_size, tcondvar=args.tcondvar)
+    train_set, test_set, all_set, train_loader, test_loader, all_loader, norm_dict, time_serie_len = load_data(args.path, args.data_file, args.idx_file, time_spec_converter=time_spec_converter, train_bs=args.batch_size, tcondvar=args.tcondvar, loc=args.loc)
     SEQ_LEN = time_serie_len//args.h_len + 1
 
     # set-up neptune
