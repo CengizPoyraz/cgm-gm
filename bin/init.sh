@@ -1,0 +1,1 @@
+chmod o+x $GMS_HOME/bin/*.sh
