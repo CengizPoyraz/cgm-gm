@@ -247,3 +247,97 @@ class TimeSpecConverter:
             hop_length=self.hop_length,
             win_length=self.window_length
         )
+
+def load_and_preprocess_data(data_path, preprocessor):
+    """
+    Load and preprocess waveform data
+    
+    Args:
+        data_path: Path to CSV file
+        preprocessor: WaveformPreprocessor instance
+    """
+    print(f"Loading data from {data_path}")
+    df = pd.read_csv(data_path)
+    
+    # Extract sampling frequency from data (column 7)
+    sampling_freq = df.iloc[0, 7]  # Get sampling frequency from first row
+    print(f"Sampling frequency: {sampling_freq} Hz")
+    
+    # Get waveform data starting from column 14
+    print("Extracting waveforms...")
+    waveforms = df.iloc[:, 14:].values
+    
+    print(f"Waveform data shape: {waveforms.shape}")
+    print(f"Waveform sample: \n{waveforms[0, :10]}")  # Print first 10 values of first waveform
+    
+    # Reshape if needed - WaveformPreprocessor expects [samples] or [batch, samples]
+    if len(waveforms.shape) == 2:
+        print("Reshaping waveforms to [batch, samples]")
+        waveforms = waveforms.reshape(waveforms.shape[0], -1)
+        
+    print(f"Waveform data range: [{waveforms.min()}, {waveforms.max()}]")
+    print(f"Any NaN values: {np.isnan(waveforms).any()}")
+    
+    # Process waveforms in smaller batches to avoid memory issues
+    batch_size = 100
+    total_samples = len(waveforms)
+    all_magnitudes = []
+    all_phases = []
+    all_norm_dicts = []
+    
+    print(f"\nProcessing {total_samples} waveforms in batches of {batch_size}")
+    
+    for i in range(0, total_samples, batch_size):
+        end_idx = min(i + batch_size, total_samples)
+        batch = waveforms[i:end_idx]
+        
+        try:
+            print(f"\nProcessing batch {i//batch_size + 1}/{(total_samples + batch_size - 1)//batch_size}")
+            print(f"Batch shape: {batch.shape}")
+            
+            magnitudes, phases, norm_dict = preprocessor.batch_process(
+                batch,
+                sampling_freq=sampling_freq,
+                validate=False  # Set to True if you want SNR validation
+            )
+            
+            if magnitudes is not None and len(magnitudes) > 0:
+                all_magnitudes.append(magnitudes)
+                all_phases.append(phases)
+                all_norm_dicts.append(norm_dict)
+                print(f"Successfully processed batch. Magnitudes shape: {magnitudes.shape}")
+            else:
+                print("Warning: Empty or None output from batch_process")
+                
+        except Exception as e:
+            print(f"Error processing batch {i//batch_size + 1}: {str(e)}")
+            continue
+    
+    if not all_magnitudes:
+        raise RuntimeError("No waveforms were successfully processed")
+    
+    # Combine results
+    try:
+        combined_magnitudes = torch.cat(all_magnitudes, dim=0)
+        combined_phases = torch.cat(all_phases, dim=0)
+        
+        # Combine normalization dictionaries
+        combined_norm_dict = {
+            'wf_min': min(d['wf_min'] for d in all_norm_dicts),
+            'wf_max': max(d['wf_max'] for d in all_norm_dicts)
+        }
+        
+        print(f"\nFinal processed data:")
+        print(f"Magnitudes shape: {combined_magnitudes.shape}")
+        print(f"Phases shape: {combined_phases.shape}")
+        print(f"Normalization range: [{combined_norm_dict['wf_min']}, {combined_norm_dict['wf_max']}]")
+        
+        return combined_magnitudes, combined_phases, combined_norm_dict
+        
+    except Exception as e:
+        print("Error combining results:")
+        print(f"Number of magnitude tensors: {len(all_magnitudes)}")
+        print(f"Number of phase tensors: {len(all_phases)}")
+        print(f"Error message: {str(e)}")
+        raise
+   
