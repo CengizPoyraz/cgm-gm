@@ -80,7 +80,7 @@ def load_and_preprocess_data(path, data_file_path, idx_file_path, time_spec_conv
 
     # Extract waveforms and remove first 1000 samples
     wfs = data.iloc[:, 14:].to_numpy()
-    wfs = wfs[:, np.newaxis, 1000:]  # Remove first 1000 samples and add channel dimension
+    wfs = wfs[:, np.newaxis, :]  # add channel dimension
     time_serie_len = wfs.shape[-1]
     
     sampling_freq = info['Sampling Frequency'].iloc[0]

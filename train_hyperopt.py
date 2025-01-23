@@ -16,7 +16,7 @@ import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from model.dvae import *
-from get_data import load_data, min_max_norm, get_phase_mag
+from get_data import  load_data, min_max_norm, get_phase_mag, load_and_preprocess_data
 
 from utils.utils_vis import plt_ori_vs_gen, plt_ori_vs_rec
 from metrics.discrimanitive import discriminative_score_metrics
