@@ -451,11 +451,12 @@ if __name__ == '__main__':
             space = {  # Architecture parameters
                 'model': 'vae',
                 'lr': hp.choice('lr', [1e-5, 1e-4, 1e-3]),
-                'z_rnn_dim': hp.choice('z_rnn_dim', [32]),
-                'z_dim': hp.choice('z_dim', [16]),
-                'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),
+                'z_rnn_dim': hp.choice('z_rnn_dim', [16, 32]),
+                'z_dim': hp.choice('z_dim', [8, 16, 32]),
+                'alpha': hp.choice('alpha', [1e-4, 1e-3, 1e-2, 0.05, 0.1]),                             # penalty coefficient for time domain loss'
+                'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),  # penalty coefficient for reconstruction loss
+                'gamma': hp.choice('gamma', [0.01, 0.05, 0.1]),                             # penalty coefficient for KL divergence
                 'weight_decay': hp.choice('weight_decay', [5e-6, 1e-5, 1e-6]),
-                'alpha': hp.choice('alpha', [0.01*10, 0.05*10, 0.1*10]),
                 'ncond': hp.choice('ncond', [16, 32]),
                 'log_reg': True, # hp.choice('log_reg', [True, False]),
 
@@ -469,18 +470,7 @@ if __name__ == '__main__':
         trials = Trials()
         fmin_objective = functools.partial(main, args)
         space = get_experiment_space()
-        fmin(fmin_objective, space=space, algo=tpe.suggest, max_evals=30, trials=trials, verbose=True, rstate=rstate)
-        
-        # opt_params = {  # Architecture parameters
-        #        'model': 'vae',
-        #        'lr': 7e-4,
-        #        'z_rnn_dim': 32,
-        #        'z_dim': 16,
-        #        'beta': 0.05,
-        #        'weight_decay': 5e-6,
-
-        #        # Data parameters
-        #        'batch_size': 256}
+        fmin(fmin_objective, space=space, algo=tpe.suggest, max_evals=30, trials=trials, verbose=True, rstate=rstate)        
 
         opt_params = None
         main(args, opt_params)
