@@ -434,7 +434,7 @@ if __name__ == '__main__':
     parser.add_argument('--idx_file', type=str, dest='idx_file', default='idx.npy', help='idx file name or path')  
     parser.add_argument('--loc', type=str, dest='loc', default='EW', help='location') 
     parser.add_argument('--gamma', type=float, default=1.0, help='penalty coefficient for KL divergence')
-    parser.add_argument('--clip_value', type=float, default=1, help='clip value')
+    parser.add_argument('--clip_value', type=float, default=2.0, help='clip value')
     parser.add_argument('--only_summary', dest='only_summary', action=argparse.BooleanOptionalAction, help='model summary')
     parser.add_argument('--enable_tensorboard', dest='enable_tensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
 
