@@ -30,7 +30,7 @@ from gms.gms_utils import get_gms_path
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def loss(X, X_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg=True, alpha=1.):
+def loss(X, X_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg=True, alpha=1., gamma=1.):
 
     # X and X_hat are spectrogram in log space, with shape of [b,t,f]
     batch_size = X.shape[0]
@@ -59,7 +59,7 @@ def loss(X, X_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, bet
     kld_z = kld_z / batch_size
     time_domain_loss = time_domain_loss / batch_size
 
-    total_loss = recons_loss + beta * kld_z + alpha * time_domain_loss
+    total_loss = beta * recons_loss + gamma * kld_z + alpha * time_domain_loss
 
     return total_loss, recons_loss, time_domain_loss, kld_z
 
@@ -80,7 +80,7 @@ def train(args, model, train_loader, run, norm_dict, time_spec_converter):
     beta = args.beta
     log_reg = args.log_reg
     alpha = args.alpha
-    
+    gamma = args.gamma
     for epoch in range(args.epochs):
         run['train/epoch'].log(epoch+1)
         model.train()
@@ -105,7 +105,7 @@ def train(args, model, train_loader, run, norm_dict, time_spec_converter):
                 device=args.device)
 
             #total_loss, recons_loss, time_domain_loss, kld_z -> l, rec_loss, time_domain_l, kl_div, pgv_reg 
-            l, rec_loss, time_domain_l, kl_div = loss(wfs, wfs_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg, alpha)
+            l, rec_loss, time_domain_l, kl_div = loss(wfs, wfs_hat, z_post_mean, z_post_logvar, z_prior_mean, z_prior_logvar, beta, norm_dict, time_spec_converter, true_phase, time_domain_wfs, log_reg, alpha, gamma)
 
             optimizer.zero_grad()
             l.backward()
@@ -433,6 +433,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_file', type=str, dest='data_file', default='data.csv', help='data file name or path')  
     parser.add_argument('--idx_file', type=str, dest='idx_file', default='idx.npy', help='idx file name or path')  
     parser.add_argument('--loc', type=str, dest='loc', default='EW', help='location') 
+    parser.add_argument('--gamma', type=float, default=1.0, help='penalty coefficient for KL divergence')
     parser.add_argument('--clip_value', type=float, default=1, help='clip value')
     parser.add_argument('--only_summary', dest='only_summary', action=argparse.BooleanOptionalAction, help='model summary')
     parser.add_argument('--enable_tensorboard', dest='enable_tensorboard', action=argparse.BooleanOptionalAction, help='enable tensorboard to track training progress')
