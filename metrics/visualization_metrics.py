@@ -85,7 +85,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
     plt.title('PCA plot')
     plt.xlabel('x-pca')
     plt.ylabel('y_pca')
-    plt.savefig(get_gms_path(f'figures/sine_pca_{args.loc}.png'), transparent=True,
+    plt.savefig(get_gms_path(f'figures/sine_pca_{args.loc}_{args.tcondvar}.png'), transparent=True,
                 bbox_inches='tight', pad_inches=0, dpi=300)
     if run:
       run["test/pca_ori_gen"].log(f)
@@ -119,7 +119,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
     plt.title('t-SNE plot')
     plt.xlabel('x-tsne')
     plt.ylabel('y_tsne')
-    plt.savefig(get_gms_path(f'figures/sine_tsne_{args.loc}.png'), transparent=True,
+    plt.savefig(get_gms_path(f'figures/sine_tsne_{args.loc}_{args.tcondvar}.png'), transparent=True,
                 bbox_inches='tight', pad_inches=0, dpi=300)
     if run:
       run["test/tsne_ori_gen"].log(f)
