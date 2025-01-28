@@ -87,7 +87,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
     plt.ylabel('y_pca')
     plt.savefig(get_gms_path(f'figures/sine_pca_{args.loc}_{args.tcondvar}.png'), transparent=True,
                 bbox_inches='tight', pad_inches=0, dpi=300)
-    run["test/pca_ori_gen"].upload(get_gms_path(f'figures/sine_pca_{args.loc}_{args.tcondvar}.png'))
+    run["test/pca_ori_gen_figure"].upload(get_gms_path(f'figures/sine_pca_{args.loc}_{args.tcondvar}.png'))
     if run:
       run["test/pca_ori_gen"].log(f)
     plt.show()
@@ -122,7 +122,7 @@ def visualization (ori_data, generated_data, analysis, args, run=None):
     plt.ylabel('y_tsne')
     plt.savefig(get_gms_path(f'figures/sine_tsne_{args.loc}_{args.tcondvar}.png'), transparent=True,
                 bbox_inches='tight', pad_inches=0, dpi=300)
-    run["test/tsne_ori_gen"].upload(get_gms_path(f'figures/sine_tsne_{args.loc}_{args.tcondvar}.png'))
+    run["test/tsne_ori_gen_figure"].upload(get_gms_path(f'figures/sine_tsne_{args.loc}_{args.tcondvar}.png'))
     if run:
       run["test/tsne_ori_gen"].log(f)
     plt.show()
