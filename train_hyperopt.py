@@ -341,6 +341,7 @@ def main(args, mc):
         args.beta = mc['beta']
         args.log_reg = mc['log_reg']
         args.alpha = mc['alpha']
+        args.gamma = mc['gamma']
         args.ncond = mc['ncond']
 
     name = 'GM_V2_VAE_data5_dist-{}_bs={}-rnn_size={}-z_dim={}-lr={}' \
@@ -453,10 +454,10 @@ if __name__ == '__main__':
                 'lr': hp.choice('lr', [1e-5, 1e-4, 1e-3]),
                 'z_rnn_dim': hp.choice('z_rnn_dim', [16, 32]),
                 'z_dim': hp.choice('z_dim', [8, 16, 32]),
-                'alpha': hp.choice('alpha', [1e-5, 1e-4, 1e-3, 1e-2, 0.05, 0.1]),           # penalty coefficient for time domain loss'
+                'alpha': hp.choice('alpha', [1e-5, 1e-4, 1e-3, 1e-2, 1e-1]),           # penalty coefficient for time domain loss'
                 'beta': hp.choice('beta', [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2]),  # penalty coefficient for reconstruction loss
-                'gamma': hp.choice('gamma', [0.001, 0.005, 0.01, 0.05, 0.1, 0.2]),          # penalty coefficient for KL divergence
-                'weight_decay': hp.choice('weight_decay', [1e-7, 1e-6, 1e-5, 1e-4]),
+                'gamma': hp.choice('gamma', [1e-3, 1e-2, 1, 1e2, 1e3]),                     # penalty coefficient for KL divergence
+                'weight_decay': hp.choice('weight_decay', [1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2]),
                 'ncond': hp.choice('ncond', [16, 32]),
                 'log_reg': True, # hp.choice('log_reg', [True, False]),
 
