@@ -373,7 +373,9 @@ def min_max_norm(x, x_min, x_max, range='[0,1]', mode='add'):
             x = (x + 1.0) / 2.0
             return x * (x_max - x_min) + x_min
         elif mode == 'std':
-            return (x - np.mean(x)) / np.std(x)        
+            return (x - np.mean(x)) / np.std(x)
+        elif mode == 'sub_mean':
+            return (x - np.mean(x))             
         else:
             raise NotImplementedError
 
